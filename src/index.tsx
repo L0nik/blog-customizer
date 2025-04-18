@@ -25,7 +25,7 @@ const App = () => {
 					'--bg-color': defaultArticleState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm />
+			<ArticleParamsForm articleState={defaultArticleState} />
 			<Article />
 		</main>
 	);
