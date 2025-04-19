@@ -7,6 +7,7 @@ import { Text } from 'src/ui/text';
 
 import styles from './ArticleParamsForm.module.scss';
 import { useState, useRef, useEffect, SyntheticEvent } from 'react';
+import { clsx } from 'clsx';
 
 import {
 	ArticleStateType,
@@ -46,9 +47,10 @@ export const ArticleParamsForm = ({
 	});
 
 	useEffect(() => {
-		articleParamsRef.current!.className = isOpen
-			? `${styles.container} ${styles.container_open}`
-			: styles.container;
+		articleParamsRef.current!.className = clsx({
+			[styles.container]: true,
+			[styles.container_open]: isOpen,
+		});
 	}, [isOpen]);
 
 	useEffect(() => {
@@ -59,9 +61,9 @@ export const ArticleParamsForm = ({
 		selected: OptionType,
 		paramName: keyof ArticleStateType
 	) => {
-		const newArticleState = { ...articleState };
-		newArticleState[paramName] = selected;
-		setNewArticleState(newArticleState);
+		const articleStateObj = { ...newArticleState };
+		articleStateObj[paramName] = selected;
+		setNewArticleState(articleStateObj);
 	};
 
 	const applyNewArticleState = () => {
