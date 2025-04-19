@@ -30,32 +30,36 @@ export const ArticleParamsForm = ({
 	setArticleState,
 	resetArticleState,
 }: ArticleParamsFormProps) => {
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 	const [newArticleState, setNewArticleState] =
 		useState<ArticleStateType>(articleState);
 	const articleParamsRef = useRef<HTMLElement | null>(null);
 
 	useEffect(() => {
-		window.addEventListener('mousedown', (e: Event) => {
-			if (
-				e.target instanceof Node &&
-				!articleParamsRef.current?.contains(e.target)
-			) {
-				setIsOpen(false);
-			}
-		});
-	});
-
-	useEffect(() => {
 		articleParamsRef.current!.className = clsx({
 			[styles.container]: true,
-			[styles.container_open]: isOpen,
+			[styles.container_open]: isMenuOpen,
 		});
-	}, [isOpen]);
+
+		if (isMenuOpen) {
+			window.addEventListener('mousedown', handleOutsideClick);
+		} else {
+			window.removeEventListener('mousedown', handleOutsideClick);
+		}
+	}, [isMenuOpen]);
 
 	useEffect(() => {
 		setNewArticleState({ ...articleState });
 	}, [articleState]);
+
+	const handleOutsideClick = (e: Event) => {
+		if (
+			e.target instanceof Node &&
+			!articleParamsRef.current?.contains(e.target)
+		) {
+			setIsMenuOpen(false);
+		}
+	};
 
 	const handleArticleParamChange = (
 		selected: OptionType,
@@ -66,22 +70,21 @@ export const ArticleParamsForm = ({
 		setNewArticleState(articleStateObj);
 	};
 
-	const applyNewArticleState = () => {
+	const handleFormSubmit = (e: SyntheticEvent) => {
+		e.preventDefault();
 		setArticleState({ ...newArticleState });
 	};
 
 	return (
 		<>
 			<ArrowButton
-				isOpen={isOpen}
+				isOpen={isMenuOpen}
 				onClick={() => {
-					setIsOpen(!isOpen);
+					setIsMenuOpen(!isMenuOpen);
 				}}
 			/>
 			<aside className={styles.container} ref={articleParamsRef}>
-				<form
-					className={styles.form}
-					onSubmit={(e: SyntheticEvent) => e.preventDefault()}>
+				<form className={styles.form} onSubmit={handleFormSubmit}>
 					<Text size={31} weight={800}>
 						Задайте параметры
 					</Text>
@@ -134,12 +137,7 @@ export const ArticleParamsForm = ({
 							type='clear'
 							onClick={resetArticleState}
 						/>
-						<Button
-							title='Применить'
-							htmlType='submit'
-							type='apply'
-							onClick={applyNewArticleState}
-						/>
+						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>
